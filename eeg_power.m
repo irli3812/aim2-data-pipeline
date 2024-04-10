@@ -1,21 +1,26 @@
-function [] = eeg_power(subject)%% TRINITY AIM 2 - EEG POWER ANALYSIS        
+%%function [] = eeg_power(subject)%% TRINITY AIM 2 - EEG POWER ANALYSIS        
 % eeg_power.m
 %
 % Purpose: To read in EEG data and conduct power analyses for ONE subject.
 %
 % Inputs: subject number as a string, not integer
 %
+% Requirements:
+% - connection to Shuttle Server as Z: drive
+% - download load_xdf MATLAB code from GitHub
+% - eeglab2023.1 must be stored in ./../eeglab/
+%
 % Authors: Luca Bonarrigo, Iris Li
 %
 % Created: 3/21/2023
-% Last edited: 4/9/2023
+% Last edited: 4/10/2023
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Housekeeping
 clc; clear; close all;
 set(0,'defaultTextInterpreter', 'latex'); 
 
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-eeglabpath = '.\..\'; % INPUT location of eeglab
+eeglabpath = '.\..\eeglab\'; % INPUT location of eeglab
 
 %% 2.1: open XDF and save event values from triggers to a new MATLAB array
 xdfpath = 'Z:\files\MATRIKS\lbonarrigo\SubjectData\xdf\'; 
@@ -37,7 +42,7 @@ EEG = pop_loadxdf(path);
 
 %% 2.2: pull in and reorder channel locations 
 % read default 32 easy channel locations into the xdf file using dipfit
-dipfitpath = strcat(eeglabpath,'eeglab\eeglab2023.1\plugins\dipfit\standard_BEM\elec\standard_1005.elc');
+dipfitpath = strcat(eeglabpath,'eeglab2023.1\plugins\dipfit\standard_BEM\elec\standard_1005.elc');
 defaultchans = 'Z:\files\MATRIKS\lbonarrigo\EEGLAB_Pipeline_Loc_Files\32_chan_locs'; % in Shuttle server
 EEG=pop_chanedit(EEG, 'lookup', dipfitpath, 'load',{defaultchans,'filetype','loc'});
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
@@ -77,9 +82,16 @@ EEG = pop_iclabel(EEG, 'default');
 [ALLEEG, EEG, CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
 % let operator know when done to do manual rejection
-eeglab redraw;
+%eeglab redraw;
 f = msgbox("WHEN DONE WITH MANUAL ICA REJECTION, PRESS ANY KEY WITHIN THE MATLAB TERMINAL. DO NOT KEYPRESS UNTIL DONE WITH ICA!");
 f = msgbox("ICA finished running. Go to Tools>Classify Components Using ICLabel>Label Components to flag and remove components manually.");
+
+eeglab redraw;
+
+disp('WHEN DONE WITH MANUAL ICA REJECTION, PRESS ANY KEY WITHIN THE MATLAB TERMINAL.')
+pause();
+
+%eeglab redraw;
 
 % at this point, operator should go through everything and flag components
 % for rejection manually. once ready, they should run the next section
@@ -102,4 +114,4 @@ end
 
 
 %% 2.6: Power Analysis
-end
+%%end
