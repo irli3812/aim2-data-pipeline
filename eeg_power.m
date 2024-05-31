@@ -20,7 +20,7 @@ clc; clear; close all;
 set(0,'defaultTextInterpreter', 'latex'); 
 
 [ALLEEG EEG CURRENTSET ALLCOM] = eeglab;
-eeglabpath = '.\eeglab\'; % INPUT location of eeglab
+eeglabpath = '.\eeglab\';
 addpath('./xdf-Matlab-master');
 
 %% CHECKPOINT
@@ -41,7 +41,9 @@ end
 xdfpath = 'Z:\files\MATRIKS\lbonarrigo\SubjectData\xdf\'; 
 % to modify this to work for multiple subjects, comment the following line:
 subject = input("Which subject number do you want to run? ",'s'); % for now, this asks for a specific subject number 
-filename = strcat('sub-P',subject,'_ses-S001_task-Default_run-001_eeg.xdf');
+% filename = strcat('sub-P',subject,'_ses-S002_task-Default_run-001_eeg.xdf'); % alter session number here!
+session = input('Which session (of 1 digit) of this subject do you want to run? ', 's');
+filename = strcat('sub-P',subject,'_ses-S00',session,'_task-Default_run-001_eeg.xdf');
 path = strcat(xdfpath,filename);
 
 % dataset name (first iteration)

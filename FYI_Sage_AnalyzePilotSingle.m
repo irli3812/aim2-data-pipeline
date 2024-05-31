@@ -10,7 +10,7 @@ close all; clear all; clc;
 %% load data
 % this function loads a specific .nirs file (based on file location)
 %raw =  nirs.io.loadDotNirs(fullfile(pwd,"\Pilot Data\BySingle\ASR\2022-12-18_002.nirs"));
-raw =  nirs.io.loadDotNirs(fullfile(pwd,"\2022-11-02_001.nirs"));
+% raw =  nirs.io.loadDotNirs(fullfile(pwd,"\2022-11-02_001.nirs"));
 
 % This file can remove specific triggers, reducing conditions if you need to 
 raw = modifyData2(raw);
@@ -150,5 +150,3 @@ ContrastStats.draw('tstat', [-5 5], 'p < 0.05');
 
 % ContrastStats is yet anouther ChannelStats variable and has all the same methods
 % and fields as the other ones we have seen.
-
-
