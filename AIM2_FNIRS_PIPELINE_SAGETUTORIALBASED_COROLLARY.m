@@ -20,35 +20,13 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 
 close all; clear all; clc;
-%% Requirement 1: NIRS toolbox must be downloaded and added to directory path for this to work
-toolboxpath = 'C:\Users\Iris Li\Desktop\fNIRS\'; % INPUT location of nirstoolbox* 
-% if exist(toolboxpath, 'dir')
-%     % Generate path string for the toolbox directory and its subfolders
-%     nirstoolbox = genpath(toolboxpath);
-% 
-%     % Set the folder as the working directory
-%     cd(nirstoolbox);
-%     disp(['Working directory set to: ', nirstoolbox]);
-% 
-% else
-%     % Display an error message if the folder doesn't exist
-%     error(['NIRS toolbox path', toolboxpath, ' does not exist.']);
-% end
 %% Upload .nirs data file
-% nirspath = 'Z:\files\MATRIKS\lbonarrigo\SubjectData\nirs\pilot_nbacks\';
-% subno = input('Which subject number (of 3 digits) do you want to run? ', 's'); % for now, this asks for a specific subject number
-% session = input('Which session (of 1 digit) of this subject do you want to run? ', 's');
-% data = strcat(subno,'_ses-S00',session,'_fnirs');
-% raw = strcat(nirspath,data);
-% disp(raw);
-% %import nirs.io.loadDotNirs.*  %<-- in an attempt to fix "Unable to resolve the name nirs.io."
-% dataraw = nirs.io.loadDotNirs(fullfile(raw)); %THIS COMMAND IS NOT WORKING 12:34 in tutorial
-
-% dir='C:\Users\Iris Li\Desktop\fNIRS\nirs-toolbox-2022.4.26\2023-12-11_001.nirs';
-import nirs.io.loadDotNirs.*;
-% raw = nirs.io.loadDirectory(dir);
-data = fullfile(pwd,"\711_ses_S001_fnirs");
-raw =  nirs.io.loadDotNirs(data);
+nirspath = 'Z:\files\MATRIKS\lbonarrigo\SubjectData\nirs\pilot_nbacks\';
+subno = input('Which subject number (of 3 digits) do you want to run? ', 's'); % for now, this asks for a specific subject number
+session = input('Which session (of 1 digit) of this subject do you want to run? ', 's');
+data = strcat(subno,'_ses_S00',session,'_fnirs.nirs');
+disp(fullfile(nirspath,data)); % Check the filepath
+raw = nirs.io.loadDotNirs(fullfile(nirspath,data)); %THIS COMMAND IS NOT WORKING 12:34 in tutorial
 %% FYI
 % openvar('data');
 % resample (if you want)
@@ -66,7 +44,8 @@ j.highpass = 0.01;
 
 %% Stimuli
 
-% change the name of stimuli
+% change the name of stimuli - alternative route = discard stimuli besides
+% these and don't rename the stims
 j = nirs.modules.RenameStims( j );
 % ASR
 j.listOfChanges = {
@@ -90,7 +69,7 @@ j.Fs = 4;
 % and only discard the pre-event times.
 
 % Before doing regression we must convert to optical density and then
-% hemoglobin.  The two modules must be done in order. (lines up w/ AFOSR
+% hemoglobin. The two modules must be done in order. (lines up w/ AFOSR
 % line 17)
 j = nirs.modules.OpticalDensity(j);
 od = j.run(raw); % Runs and saves to a new variable.
@@ -100,16 +79,21 @@ j = nirs.modules.BeerLambertLaw(j);
 hb = j.run(raw); % Runs and saves to a new variable.
 
 % change stimulus duration, oftentimes the default duration is incorrect to
-% what you setup in psychtoolbox (?)
-hb = nirs.design.change_stimulus_duration(hb, 'First Trial Started', 100); % MAX TIME - 20s max per trial, 5 total trials for task 1 (TCT)
-hb = nirs.design.change_stimulus_duration(hb, 'Task 1 Ended', 20); % aka task 2 (MMR) starts
-hb = nirs.design.change_stimulus_duration(hb, 'Task 2 Ended', 20); % aka task 3 (VS) starts
-hb = nirs.design.change_stimulus_duration(hb, 'Task 3 Ended', 0);
-hb = nirs.design.change_stimulus_duration(hb, 'Next Trial Started', 100);
+% what you setup in Unity
+stimNames = unique(nirs.getStimNames(hb))
+stimCount = length(stimNames)
+for stimIDX = 1:stimCount
+    hb = nirs.design.change_stimulus_duration(hb,stimNames(stimIDX),70);
+end
+% hb = nirs.design.change_stimulus_duration(hb, 'First Trial Started', 70); % MAX TIME 100s - 20s max per trial, 5 total trials for task 1 (TCT)
+% hb = nirs.design.change_stimulus_duration(hb, 'Task 1 Ended', 20); % aka task 2 (MMR) starts
+% hb = nirs.design.change_stimulus_duration(hb, 'Task 2 Ended', 20); % aka task 3 (VS) starts
+% hb = nirs.design.change_stimulus_duration(hb, 'Task 3 Ended', 0);
+% hb = nirs.design.change_stimulus_duration(hb, 'Next Trial Started', 100);
 %% create subject specific stats
 
 % Filter to show the GUI to see the hb data, the timeseries data.
-nirs.viz.nirsviewer( hb );
+nirs.viz.nirsviewer(hb);
 
 % TURN OFF filtering if exploring and analyzing glm data, the toolbox will
 % filter the data for you
@@ -119,6 +103,10 @@ jobs=nirs.modules.ExportData(jobs);
 jobs.Output='SubjStats';
 data=jobs.run(hb); % this runs the glm
 
+%% What Sarah does atp:
+%Here, I then go into the filtered hb data in matlab, copy it to excel 
+% and plot it. You can also plot in matlab, I just prefer excel for plotting
+%one channel of the time. 
 %% Group level (n/a?)
 
 % Run the statistical model to analyze what we care about
