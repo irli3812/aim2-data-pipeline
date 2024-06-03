@@ -39,7 +39,7 @@ j = nirs.modules.RemoveStimless( );
 
 % Filter Data
 j = eeg.modules.BandPassFilter();
-j.lowpass= .5;
+j.lowpass= 0.5;
 j.highpass = 0.01;
 
 %% Stimuli
@@ -55,7 +55,7 @@ j.listOfChanges = {
     'stim_channel4', 'Task 3 Ended';
     'stim_channel5', 'Next Trial Started';
     };
-j = nirs.modules.Resample ( j );
+j = nirs.modules.Resample (j);
 j.Fs = 4;
 
 % IF NEEDED?: Many times you can have files excessive baselines before the start or at
