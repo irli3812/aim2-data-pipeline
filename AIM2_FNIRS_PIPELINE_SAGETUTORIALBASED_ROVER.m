@@ -38,11 +38,9 @@ toolboxpath = 'C:\Users\Iris Li\Desktop\fNIRS\'; % INPUT location of nirstoolbox
 nirspath = 'Z:\files\MATRIKS\lbonarrigo\SubjectData\nirs\pilot_nbacks\';
 subno = input('Which subject number (of 3 digits) do you want to run? ', 's'); % for now, this asks for a specific subject number
 session = input('Which session (of 1 digit) of this subject do you want to run? ', 's');
-rawfile = strcat(subno,'_ses-S00',session,'_fnirs.nirs');
-filepath = strcat(nirspath,rawfile);
-% import nirs.io.loadDotNirs.*  <-- in an attempt to fix "Unable to resolve the name nirs.io."
-data = nirs.io.loadDotNirs(filepath); %THIS COMMAND IS NOT WORKING
-openvar('data');
+data = strcat(subno,'_ses_S00',session,'_fnirs.nirs');
+disp(fullfile(nirspath,data)); % Check the filepath
+raw = nirs.io.loadDotNirs(fullfile(nirspath,data));
 
 %% Preprocessing Pipeline
 j = nirs.modules.RemoveStimless( );
@@ -149,11 +147,30 @@ j = nirs.modules.BeerLambertLaw( j );
 % Finally, run the pipeline on the raw data and save to a new variable.
 hb = j.run( data );
 
-% change stimulus duration, oftentimes the default duration is incorrect to what you setup in psychtoolbox
-hb = nirs.design.change_stimulus_duration(hb, 'Navigation Task Started', 150); % 150s max!
-hb = nirs.design.change_stimulus_duration(hb, 'Navigation Task Ended', 0);
-hb = nirs.design.change_stimulus_duration(hb, 'Robotic Arm Task Started', 60); % 60s max!
-hb = nirs.design.change_stimulus_duration(hb, 'Robotic Arm Task Ended', 0);
-hb = nirs.design.change_stimulus_duration(hb, 'Observation Task Started', 40);
-hb = nirs.design.change_stimulus_duration(hb, 'Rock Selected', 0);
-hb = nirs.design.change_stimulus_duration(hb, 'Observation Task Ended', 0);
+% change stimulus duration, oftentimes the default duration is incorrect to
+% what you setup in Unity
+stimNames = unique(nirs.getStimNames(hb))
+stimCount = length(stimNames)
+for stimIDX = 1:stimCount
+    hb = nirs.design.change_stimulus_duration(hb,stimNames(stimIDX),70);
+end
+%% create subject specific stats
+
+% Filter to show the GUI to see the hb data, the timeseries data.
+nirs.viz.nirsviewer(hb);
+
+% TURN OFF filtering if exploring and analyzing glm data, the toolbox will
+% filter the data for you
+jobs=nirs.modules.GLM();
+
+jobs=nirs.modules.ExportData(jobs);
+jobs.Output='SubjStats';
+data=jobs.run(hb); % this runs the glm
+%% Contrasts
+% Analyze differences between conditions for one subject in hbo and hbr
+% Specify contrast vector
+c = [0 0 1 -1]; %contrast the 2nd (Y:group1) and 4th (Y:group1) conditions.
+
+% Calculate stats with the ttest function
+ContrastStats = GroupStats.ttest(c);
+ContrastStats.draw('tstat', [-5 5], 'p < 0.05');

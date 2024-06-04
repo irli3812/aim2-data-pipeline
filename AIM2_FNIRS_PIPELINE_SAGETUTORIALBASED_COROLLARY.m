@@ -26,7 +26,7 @@ subno = input('Which subject number (of 3 digits) do you want to run? ', 's'); %
 session = input('Which session (of 1 digit) of this subject do you want to run? ', 's');
 data = strcat(subno,'_ses_S00',session,'_fnirs.nirs');
 disp(fullfile(nirspath,data)); % Check the filepath
-raw = nirs.io.loadDotNirs(fullfile(nirspath,data)); %THIS COMMAND IS NOT WORKING 12:34 in tutorial
+raw = nirs.io.loadDotNirs(fullfile(nirspath,data));
 %% FYI
 % openvar('data');
 % resample (if you want)
@@ -111,14 +111,14 @@ data=jobs.run(hb); % this runs the glm
 %% Group level (n/a?)
 
 % Run the statistical model to analyze what we care about
-% j = nirs.modules.MixedEffects( );
+j = nirs.modules.MixedEffects( );
 % 
-% % This specifies the formula for the different conditions. 
-% % condition is a fixed effect, subject is a random effect (since data is 
-% % repeated measures), no intercept term
-% j.formula = 'beta ~ -1 + cond + (1|subject)';
+% This specifies the formula for the different conditions. 
+% condition is a fixed effect, subject is a random effect (since data is 
+% repeated measures), no intercept term
+j.formula = 'beta ~ -1 + cond + (1|subject)';
 % 
-% GroupStats = j.run(SubjStats);
+GroupStats = j.run(SubjStats);
 %% Contrasts
 % Analyze differences between conditions for one subject in hbo and hbr
 % Specify contrast vector
