@@ -54,6 +54,7 @@ j.listOfChanges = {
     'stim_channel3', 'Task 2 Ended';
     'stim_channel4', 'Task 3 Ended';
     'stim_channel5', 'Next Trial Started';
+
     };
 j = nirs.modules.Resample (j);
 j.Fs = 4;
