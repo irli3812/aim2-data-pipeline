@@ -85,7 +85,7 @@ stimNames = unique(nirs.getStimNames(hb))
 stimCount = length(stimNames)
 for stimIDX = 1:stimCount
     hb = nirs.design.change_stimulus_duration(hb,stimNames(stimIDX),70);
-
+    
 end
 %% create subject specific stats
 
