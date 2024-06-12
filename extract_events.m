@@ -21,19 +21,19 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     found = 0;
     found_fnirs = 0;
     x = 1;
-    while(~found && ~found_fnirs)
+    while(~found || ~found_fnirs)
         if(strcmp(xdf_cor{1,x}.info.name,'Unity_Markers'))
             found = 1;
             markers = x;
         elseif(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
-             found_fnirs = 1;
-             aurora = x;
+            found_fnirs = 1;
+            aurora = x;
         else
             x=x+1;
         end
     end
     events_cor = xdf_cor{1,markers}; % unity events with times!
-    fnirs_cor = xdr_cor{1,aurora}; % aurora/fnirs data 
+    fnirs_cor = xdf_cor{1,aurora}; % aurora/fnirs data 
     
     %% ROVER
     % populate raw xdf file in MATLAB (for events)
@@ -42,17 +42,17 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     found = 0;
     found_fnirs = 0;
     x = 1;
-    while(~found && ~found_fnirs)
+    while(~found || ~found_fnirs)
         if(strcmp(xdf_cor{1,x}.info.name,'Unity_Markers'))
             found = 1;
             markers = x;
         elseif(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
-             found_fnirs = 1;
-             aurora = x;
+            found_fnirs = 1;
+            aurora = x;
         else
             x=x+1;
         end
     end
-    events_rov = xdf_cor{1,markers}; % unity events with times!
-    fnirs_rov = xdr_cor{1,aurora}; % aurora/fnirs data 
+    events_rov = xdf_rov{1,markers}; % unity events with times!
+    fnirs_rov = xdf_rov{1,aurora}; % aurora/fnirs data 
 end
