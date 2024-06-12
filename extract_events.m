@@ -1,4 +1,4 @@
-function [events_corollary,events_rover] = extract_events(subject)
+function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_events(subject)
 % extract_events.m
 % purpose: extract event flags from corollary (001) and rover (002) xdf files
 % input: subject number as a string (or no input, in which case you will be
@@ -13,41 +13,46 @@ function [events_corollary,events_rover] = extract_events(subject)
     path1 = strcat(xdfpath,filename1);
     path2 = strcat(xdfpath,filename2);
     
-    
-    % dataset name (first iteration)
-    dataset = strcat('s',subject,'_raw');
-    
     %% COROLLARY
     % populate raw xdf file in MATLAB (for events)
-    xdf1 = load_xdf(path1); % loads into MATLAB
+    xdf_cor = load_xdf(path1); % loads into MATLAB
 
      %find index corresponding to Unity_Markers
     found = 0;
+    found_fnirs = 0;
     x = 1;
-    while(~found)
-        if(strcmp(xdf1{1,x}.info.name,'Unity_Markers'))
+    while(~found && ~found_fnirs)
+        if(strcmp(xdf_cor{1,x}.info.name,'Unity_Markers'))
             found = 1;
             markers = x;
+        elseif(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
+             found_fnirs = 1;
+             aurora = x;
         else
             x=x+1;
         end
     end
-    events_corollary = xdf1{1,markers}; % unity events with times!
+    events_cor = xdf_cor{1,markers}; % unity events with times!
+    fnirs_cor = xdr_cor{1,aurora}; % aurora/fnirs data 
     
     %% ROVER
     % populate raw xdf file in MATLAB (for events)
-    xdf2 = load_xdf(path2); % loads into MATLAB
+    xdf_rov = load_xdf(path2); % loads into MATLAB
     
     found = 0;
+    found_fnirs = 0;
     x = 1;
-    % find the index corresponding to Unity_Markers
-    while(~found)
-        if(strcmp(xdf2{1,x}.info.name,'Unity_Markers'))
+    while(~found && ~found_fnirs)
+        if(strcmp(xdf_cor{1,x}.info.name,'Unity_Markers'))
             found = 1;
             markers = x;
+        elseif(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
+             found_fnirs = 1;
+             aurora = x;
         else
             x=x+1;
         end
     end
-    events_rover = xdf2{1,markers}; % unity events with times!
+    events_rov = xdf_cor{1,markers}; % unity events with times!
+    fnirs_rov = xdr_cor{1,aurora}; % aurora/fnirs data 
 end
