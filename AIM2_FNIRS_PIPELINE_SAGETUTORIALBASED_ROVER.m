@@ -58,9 +58,9 @@ j.highpass = 0.01;
 j = nirs.modules.RenameStims( j );
 % ASR
 j.listOfChanges = {
-    'stim_channel1', 'Navigation Task Started';
-    'stim_channel2', 'Navigation Task Ended'
-    'stim_channel4', 'Robot Arm Task Started';
+    'stim_channel1', 'Navigation Task Started'; % 150s maximum - usually less
+    'stim_channel2', 'Navigation Task Ended'; % 0s
+    'stim_channel4', 'Robot Arm Task Started'; %
     'stim_channel5', 'Robot Arm Task Ended';
     'stim_channel6', 'Observation Task Started';
     'stim_channel7', 'Rock Selected';
@@ -84,7 +84,7 @@ hb = j.run( data );
 stimNames = unique(nirs.getStimNames(hb))
 stimCount = length(stimNames)
 for stimIDX = 1:stimCount
-    hb = nirs.design.change_stimulus_duration(hb,stimNames(stimIDX),70);
+    hb = nirs.design.change_stimulus_duration(hb,stimNames(stimIDX),70); %add code in 70s spot to 
 
 end
 %% create subject specific stats
@@ -107,3 +107,4 @@ c = [0 0 1 -1]; %contrast the 2nd (Y:group1) and 4th (Y:group1) conditions.
 % Calculate stats with the ttest function
 ContrastStats = GroupStats.ttest(c);
 ContrastStats.draw('tstat', [-5 5], 'p < 0.05');
+
