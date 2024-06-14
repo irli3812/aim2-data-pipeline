@@ -48,7 +48,7 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     found = 0;
     x = 1;
     while(~found)
-        if(strcmp(xdf_cor{1,x}.info.name,'Unity_Markers'))
+        if(strcmp(xdf_rov{1,x}.info.name,'Unity_Markers'))
             found = 1;
             markers = x;
         else
@@ -58,7 +58,7 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     found_fnirs = 0;
     x = 1;
     while(~found_fnirs)
-        if(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
+        if(strcmp(xdf_rov{1,x}.info.name,'Aurora'))
             found_fnirs = 1;
             aurora = x;
         else
