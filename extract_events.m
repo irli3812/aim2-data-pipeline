@@ -19,13 +19,19 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
 
      %find index corresponding to Unity_Markers
     found = 0;
-    found_fnirs = 0;
     x = 1;
-    while(~found || ~found_fnirs)
+    while(~found)
         if(strcmp(xdf_cor{1,x}.info.name,'Unity_Markers'))
             found = 1;
             markers = x;
-        elseif(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
+        else
+            x=x+1;
+        end
+    end
+    found_fnirs = 0;
+    x = 1;
+    while(~found_fnirs)
+        if(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
             found_fnirs = 1;
             aurora = x;
         else
@@ -40,13 +46,19 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     xdf_rov = load_xdf(path2); % loads into MATLAB
     
     found = 0;
-    found_fnirs = 0;
     x = 1;
-    while(~found || ~found_fnirs)
+    while(~found)
         if(strcmp(xdf_cor{1,x}.info.name,'Unity_Markers'))
             found = 1;
             markers = x;
-        elseif(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
+        else
+            x=x+1;
+        end
+    end
+    found_fnirs = 0;
+    x = 1;
+    while(~found_fnirs)
+        if(strcmp(xdf_cor{1,x}.info.name,'Aurora'))
             found_fnirs = 1;
             aurora = x;
         else
