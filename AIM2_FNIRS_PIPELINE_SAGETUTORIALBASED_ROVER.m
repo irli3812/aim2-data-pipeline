@@ -40,8 +40,7 @@ subno = input('Which subject number (of 3 digits) do you want to run? ', 's'); %
 session = input('Which session (of 1 digit) of this subject do you want to run? ', 's');
 rawfile = strcat(subno,'_ses-S00',session,'_fnirs.nirs');
 filepath = strcat(nirspath,rawfile);
-% import nirs.io.loadDotNirs.*  <-- in an attempt to fix "Unable to resolve the name nirs.io."
-data = nirs.io.loadDotNirs(filepath); %THIS COMMAND IS NOT WORKING
+data = nirs.io.loadDotNirs(filepath);
 openvar('data');
 
 %% Preprocessing Pipeline
