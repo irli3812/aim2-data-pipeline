@@ -13,10 +13,7 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     filename2 = strcat('sub-P',subject,'_ses-S002_task-Default_run-001_eeg.xdf');
     path1 = strcat(xdfpath,filename1); % for session 1
     path2 = strcat(xdfpath,filename2); % for session 2
-    [streams1,fileheader1,names1] = loadnames_xdf(path1); % streams1 from sesh 1
-    [streams2,fileheader2,names2] = loadnames_xdf(path2); % streams2 from sesh 2
-    % save(strcat(xdfpath,'streams','fileheader','names');
-    
+
     %% COROLLARY
     % populate raw xdf file in MATLAB (for events)
     xdf_cor = load_xdf(path1); % loads into MATLAB
@@ -75,6 +72,6 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
 % isolate HbO and HbR columns
     chanNames = cell(length(42:81),1);
     for i = 42:81
-        chanNames{i-41} = streams2{j}.info.desc.channels.channel{i}.custom_name;
+        chanNames{i-41} = xdf_rov{j}.info.desc.channels.channel{i}.custom_name;
     end
 end
