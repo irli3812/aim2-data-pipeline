@@ -69,9 +69,10 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     events_rov = xdf_rov{1,markers}; % unity events with times!
     fnirs_rov = xdf_rov{1,aurora}; % aurora/fnirs data 
 
-% isolate HbO and HbR columns
+% isolate HbO and HbR columns - optode pairs
+% chanNames = fnirs_rov(42:81, :);
     chanNames = cell(length(42:81),1);
     for i = 42:81
-        chanNames{i-41} = xdf_rov{j}.info.desc.channels.channel{i}.custom_name;
+        chanNames{i-40} = fnirs_rov{j}.info.desc.channels.channel{i}.custom_name;
     end
 end

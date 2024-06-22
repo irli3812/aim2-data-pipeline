@@ -11,11 +11,9 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     xdfpath = 'Z:\files\MATRIKS\lbonarrigo\SubjectData\xdf\'; 
     filename1 = strcat('sub-P',subject,'_ses-S001_task-Default_run-001_eeg.xdf');
     filename2 = strcat('sub-P',subject,'_ses-S002_task-Default_run-001_eeg.xdf');
-    path1 = strcat(xdfpath,filename1);
-    path2 = strcat(xdfpath,filename2);
-    [streams,fileheader,names] = loadnames_xdf(path1);
-    save(strcat(xdfpath,'streams','fileheader','names');
-    
+    path1 = strcat(xdfpath,filename1); % for session 1
+    path2 = strcat(xdfpath,filename2); % for session 2
+
     %% COROLLARY
     % populate raw xdf file in MATLAB (for events)
     xdf_cor = load_xdf(path1); % loads into MATLAB
@@ -71,10 +69,10 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     events_rov = xdf_rov{1,markers}; % unity events with times!
     fnirs_rov = xdf_rov{1,aurora}; % aurora/fnirs data 
 
-% % isolate HbO and HbR columns
-%     chanNames = cell(length(42:81),1);
-%     for i = 42:81
-%         chanNames{i-41} = fnirs_cor{j}.info.desc.channels.channel{i}.custom_name;
-%     end
-%     disp(chanNames);
+% isolate HbO and HbR columns - optode pairs
+chanNames = fnirs_rov(42:81, :);
+    % chanNames = cell(length(42:81),1);
+    for i = 42:81
+        chanNames{i-41} = fnirs_rov{j}.info.desc.channels.channel{i}.custom_name;
+    end
 end
