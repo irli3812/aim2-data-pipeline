@@ -73,6 +73,6 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
 % chanNames = fnirs_rov(42:81, :);
     chanNames = cell(length(42:81),1);
     for i = 42:81
-        chanNames{i-40} = fnirs_rov{j}.info.desc.channels.channel{i}.custom_name;
+        chanNames{i-40} = fnirs_rov.info.desc.channels.channel{1,i}.custom_name;
     end
 end
