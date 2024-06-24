@@ -27,13 +27,14 @@ session = input('Which session (of 1 digit) of this subject do you want to run? 
 data = strcat(subno,'_ses_S00',session,'_fnirs.nirs');
 disp(fullfile(nirspath,data)); % Check the filepath
 raw = nirs.io.loadDotNirs(fullfile(nirspath,data));
-%% FYI
+%% FYI (from psychophys pipeline)
 % openvar('data');
 % resample (if you want)
 % 
 %job=nirs.modules.Resample ;
 %job.Fs = 240;
 %rs=job.run(raw) ;
+
 %% Preprocessing Pipeline
 j = nirs.modules.RemoveStimless( );
 
