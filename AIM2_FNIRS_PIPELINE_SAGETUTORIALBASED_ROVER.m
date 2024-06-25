@@ -16,7 +16,7 @@
 % Author: Iris Li
 %
 % Created: 3/30/2024
-% Last edited: 4/30/2024
+% Last edited: 6/14/2024
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% Housekeeping
 close all; clear all; clc;
@@ -43,49 +43,62 @@ filepath = strcat(nirspath,rawfile);
 data = nirs.io.loadDotNirs(filepath);
 openvar('data');
 
+%% Separating Data
+hb_raw = extract_events(subno);
+disp(events_rov);
+hb.data = double(hb_raw');
+
 %% Preprocessing Pipeline
-j = nirs.modules.RemoveStimless( );
+j = nirs.modules.RemoveStimless();
 
 % Filter Data
 j = eeg.modules.BandPassFilter();
-j.lowpass= .5;
-j.highpass = 0.01;
+j.lowpass= 0.500;
+j.highpass = 0.016;
 
-%% Stimuli
+%% Stimuli -- confusing part
 
 % change the name of stimuli
-j = nirs.modules.RenameStims( j );
+j = nirs.modules.RenameStims(j);
 % ASR
 j.listOfChanges = {
-    'stim_channel1', 'Navigation Task Started'; % 150s maximum - usually less
-    'stim_channel2', 'Navigation Task Ended'; % 0s
-    'stim_channel4', 'Robot Arm Task Started'; %
+    'stim_channel1', 'Navigation Task Started';
+    'stim_channel2', 'Navigation Task Ended';
+    'stim_channel4', 'Robot Arm Task Started';
     'stim_channel5', 'Robot Arm Task Ended';
     'stim_channel6', 'Observation Task Started';
     'stim_channel7', 'Rock Selected';
     'stim_channel15', 'Observation Task Ended';
     };
-j = nirs.modules.Resample ( j );
+j = nirs.modules.Resample (j);
 j.Fs = 4;
 
 % convert to optical density and then
 % hemoglobin.  The two modules must be done in order.
-j = nirs.modules.OpticalDensity( j );
+j = nirs.modules.OpticalDensity(j);
 
 % Convert to hemoglobin.
-j = nirs.modules.BeerLambertLaw( j );
+j = nirs.modules.BeerLambertLaw(j);
 
 % Finally, run the pipeline on the raw data and save to a new variable.
-hb = j.run( data );
+hb = j.run(data);
+%HOW IS THIS SEPARATING HBO VS. HB??
 
-% change stimulus duration, oftentimes the default duration is incorrect to
-% what you setup in Unity
+% change stimulus duration, oftentimes the default duration is incorrect to what you setup in Unity
 stimNames = unique(nirs.getStimNames(hb))
 stimCount = length(stimNames)
 for stimIDX = 1:stimCount
     hb = nirs.design.change_stimulus_duration(hb,stimNames(stimIDX),70); %add code in 70s spot to 
 
 end
+% hb = nirs.design.change_stimulus_duration(hb, 'Navigation Task Started', 150); % MAX TIME 
+% hb = nirs.design.change_stimulus_duration(hb, 'Navigation Task Ended', 0);
+% hb = nirs.design.change_stimulus_duration(hb, 'Robot Arm Task Started', 60);
+% hb = nirs.design.change_stimulus_duration(hb, 'Robot Arm Task Ended', 0);
+% hb = nirs.design.change_stimulus_duration(hb, 'Observation Task Started', 40);
+% hb = nirs.design.change_stimulus_duration(hb, 'Rock Selected', 0);
+% hb = nirs.design.change_stimulus_duration(hb, 'Observation Task Ended', 0);
+
 %% create subject specific stats
 
 % Filter to show the GUI to see the hb data, the timeseries data.
@@ -98,6 +111,17 @@ jobs=nirs.modules.GLM();
 jobs=nirs.modules.ExportData(jobs);
 jobs.Output='SubjStats';
 data=jobs.run(hb); % this runs the glm
+%% Group level
+
+% Run the statistical model to analyze what we care about
+j = nirs.modules.MixedEffects( );
+% 
+% This specifies the formula for the different conditions. 
+% condition is a fixed effect, subject is a random effect (since data is 
+% repeated measures), no intercept term
+j.formula = 'beta ~ -1 + cond + (1|subject)'; %within subject
+% 
+GroupStats = j.run(SubjStats);
 %% Contrasts
 % Analyze differences between conditions for one subject in hbo and hbr
 % Specify contrast vector

@@ -67,4 +67,6 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
     end
     events_rov = xdf_rov{1,markers}; % unity events with times!
     fnirs_rov = xdf_rov{1,aurora}; % aurora/fnirs data 
+    disp(events_rov);
 end
+
