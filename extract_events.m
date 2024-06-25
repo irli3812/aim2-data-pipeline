@@ -3,7 +3,6 @@ function [fnirs_cor,fnirs_rov,events_cor,events_rov,path1,path2] = extract_event
 % purpose: extract event flags from corollary (001) and rover (002) xdf files
 % input: subject number as a string (or no input, in which case you will be
 % asked for a subject number)
-% Last edited: 6/21/24 by Iris
     if(~subject)
         subject = input("Which subject number do you want to run? ",'s'); % for now, this asks for a specific subject number 
     end

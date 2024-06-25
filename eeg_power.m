@@ -42,7 +42,7 @@ subject = input("Which subject number do you want to run? ",'s'); % for now, thi
 
 %% 2.1: open XDF and save event values from triggers to a new MATLAB array
 
-[~,~,events_cor,events_rov,path_rov,path_cor] = extract_events();
+[~,~,events_cor,events_rov,path_rov,path_cor] = extract_events(); %should this not be extract_events(subject)?
     
 % dataset name (first iteration)
 dataset = strcat('s',subject,'_raw');
@@ -101,8 +101,6 @@ eeglab redraw;
 
 disp('WHEN DONE WITH MANUAL ICA REJECTION, PRESS ANY KEY WITHIN THE MATLAB TERMINAL.')
 pause();
-
-%eeglab redraw;
 
 % at this point, operator should go through everything and flag components
 % for rejection manually. once ready, they should run the next section
