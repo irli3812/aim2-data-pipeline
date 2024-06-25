@@ -4,7 +4,6 @@
 clc; clear; close all;
 %% Data extraction and setting the condition variable
 subject = input('Which subject number (of 3 digits) do you want to run? ', 's');
-disp('Extracting data...');
 [fnirs_cor, fnirs_rov, events_cor, events_rov, path1, path2] = extract_events(subject);
 % condition
 condition = input('Is this for the rover or corollary condition? Type "r" for rover and "c" for corollary. ', 's');
@@ -61,19 +60,11 @@ for i = 1:numTrials
             trial(i,end)-trial(i,1) 8], 'FaceColor', [0.5 1 0.5 0.5]); % not too sure about -8 and 16
 end
 
-% Plot HbO as red lines and HbR as blue lines
+% plot HbO as red lines and HbR as blue lines
 plot(fnirsTimes, HbOraw, 'r');
 plot(fnirsTimes, HbRraw, 'b');
 
-% set con variable for titles
-if condition == "r"
-    con = 'Rover'; % con also stands for condition
-elseif condition == "c"
-    con = 'Corollary';
-end
-
-% plot labels
-title(['Entire ', con, ' Session: Raw Hemoglobin Data']);
+title(['Entire ', cond, ' Session: Raw Hemoglobin Data']);
 xlabel('Time (s)');
 ylabel('Relative Concentration (mmol/L)');
 
@@ -124,14 +115,14 @@ grid on;
 % is "trial" a variable from another function / main script??
 for i = 1:numTrials
     rectangle('position',[trial(i,1) -4 ...
-        trial(i,end)-trial(i,1) 8],'FaceColor',[0.5 1 0.5 0.5]);
+        trial(i,end)-trial(i,1) 8],'FaceColor',[0.5 1 0.5 0.5]);  % -8 and 16 again
 end
 
 % Plot transposed HbO and HbR as red lines and HbR as blue lines
 plot(time_filtered,HbO_filtered,'r');
 plot(time_filtered,HbR_filtered,'b');
 
-title(['Entire ', con, ' Session: Filtered Hemoglobin Data']);
+title(Entire ', cond, 'Session: Filtered Hemoglobin Data'));
 xlabel('Time (s)');
 ylabel('Relative Concentration (mmol/L)');
 
@@ -170,7 +161,7 @@ for i = 1:numTrials
     plot(epoch_time, HbO_epoch_data, 'r');
     plot(epoch_time, HbR_epoch_data, 'b');
 
-    title(['Trial ',num2str(i), ': Filtered Hemoglobin (', con, ' Condition)']);
+    title(strcat('Trial ',num2str(i), strcat(': Filtered Hemoglobin (', cond, ' Condition)')));
     xlabel('Time (s)');
     ylabel('Relative Concentration (mmol/L)');
 
@@ -182,3 +173,4 @@ for i = 1:numTrials
     %     saveas(gcf,strcat(path,num2str(i),', Filtered fNIRS','.png'));
     % end
 end
+

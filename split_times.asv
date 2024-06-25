@@ -61,7 +61,7 @@ function [nav_times,nav_dur,arm_times,arm_dur,vs_times,vs_dur] = split_times(eve
         events_cor = events;
     
         % find indices of nav, robot arm, vs task start and stop
-        nav_start = find(contains(events_cor.time_series,'Trial Started')); %this line is quite different...
+        nav_start = find(contains(events_cor.time_series,'Trial Started')); %this line is 
         nav_end = find(strcmp(events_cor.time_series,'Task 1 Ended')==1);
         arm_start = find(strcmp(events_cor.time_series,'Task 1 Ended')==1);
         arm_end = find(strcmp(events_cor.time_series,'Task 2 Ended')==1);

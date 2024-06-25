@@ -5,13 +5,15 @@ function [nav_times, nav_dur, arm_times, arm_duration, vs_times] = SubtaskTimes(
 %
 % Inputs:
 %   - subject: Identifier for the subject
-%   - cond: Condition (e.g., 'fnirs_rov' or 'fnirs_cor')
+%   - cond: Condition (e.g., 'c' for corollary or 'r' for rover)
 %
 % Outputs:
 %   - nav_times: A 2xN array containing start and end times of navigation tasks
 %   - nav_dur: A 1xN array containing the duration of each navigation task
+%
 %   - arm_times: A 2xN array containing start and end times of robotic arm tasks
 %   - arm_duration: A 1xN array containing the duration of each robotic arm task
+%
 %   - vs_times: A 2xN array containing start and end times of observation tasks
 
 % Load or select the appropriate dataset based on subject and cond
@@ -36,11 +38,11 @@ if cond == 'r'
     vs_end = find(strcmp(condition.time_series, 'Observation Task Ended') == 1);
 elseif cond == 'c'
     nav_start = find(contains(condition.time_series,'Trial Started'));
-    nav_end = find(strcmp(condition.time_series,'Task 1 Ended')==1);
-    arm_start = find(strcmp(condition.time_series,'Task 1 Ended')==1);
-    arm_end = find(strcmp(condition.time_series,'Task 2 Ended')==1);
-    vs_start = find(strcmp(condition.time_series,'Task 2 Ended')==1);
-    vs_end = find(strcmp(condition.time_series,'Task 3 Ended')==1);
+    nav_end = find(strcmp(condition.time_series,'Task 1 Ended') == 1);
+    arm_start = find(strcmp(condition.time_series,'Task 1 Ended') == 1);
+    arm_end = find(strcmp(condition.time_series,'Task 2 Ended') == 1);
+    vs_start = find(strcmp(condition.time_series,'Task 2 Ended') == 1);
+    vs_end = find(strcmp(condition.time_series,'Task 3 Ended') == 1);
 end
 
 % Remove duplicates from nav_end
@@ -75,7 +77,7 @@ for i=1:length(arm_end)
     arm_times(2,i) = eventtype.time_stamps(arm_end(i));
 end
 
-arm_duration = arm_times(2,:)-arm_times(1,:)-23.0756; % 23.0756 = calculated time for robot arm deploy/stowage
+arm_duration = arm_times(2,:)-arm_times(1,:)-23.0756; % 23.0756 = calculated time for robot arm deployment/stowage
 
 for i=1:length(vs_end)
     vs_times(1,i) = eventtype.time_stamps(vs_start(i));
