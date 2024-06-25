@@ -1,4 +1,8 @@
 function [nav_times,nav_dur,arm_times,arm_dur,vs_times,vs_dur] = split_times(events,type)
+% split_times.m
+% purpose: extract event times and durations from EITHER corollary or rover
+% events files
+% input: events struct (output by extract_events.m) and type = 'rov' or 'cor'
 
     % check whether corollary or rover
     if type=='rov'
