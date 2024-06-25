@@ -6,8 +6,8 @@
 subject = input('Which subject number (of 3 digits) do you want to run? ', 's');
 [fnirs_cor, fnirs_rov, events_cor, events_rov, path1, path2] = extract_events(subject);
 % condition
-cond = input('Is this for the rover or corollary condition? Type "r" for rover and "c" for corollary.');
-if cond == 'r' 
+cond = input('Is this for the rover or corollary condition? Type "r" for rover and "c" for corollary.', 's');
+if cond == 'r'
     cond = 'fnirs_rov';
 elseif cond == 'c'
     cond = 'fnirs_cor';
