@@ -6,11 +6,11 @@
 subject = input('Which subject number (of 3 digits) do you want to run? ', 's');
 [fnirs_cor, fnirs_rov, events_cor, events_rov, path1, path2] = extract_events(subject);
 % condition
-cond = input('Is this for the rover or corollary condition? Type "r" for rover and "c" for corollary.', 's');
-if cond == 'r'
-    cond = 'fnirs_rov';
-elseif cond == 'c'
-    cond = 'fnirs_cor';
+condition = input('Is this for the rover or corollary condition? Type "r" for rover and "c" for corollary.', 's');
+if condition == "r"
+    cond = fnirs_rov;
+elseif condition == "c"
+    cond = fnirs_cor;
 else
     print('Invalid input. Please enter "r" or "c."');
 end
@@ -35,6 +35,10 @@ fnirsTimes = cond.time_stamps;
 HbOraw = fnirsData(42:61,:);
 HbRraw = fnirsData(62:81,:);
 
+%% Adding time delay to fNIRS times
+% Adding time delay to fNIRS times: it is recommended to delay the fNIRS data by 3-8 seconds to represent the lag between the time the brain activity occurs, and the time the data is streamed. This line of code adds 6 seconds of delay.  
+fnirsTimes = fnirsTimes - 6; % DURIP ADDED 6 seconds, recommended 3-8 s
+
 %% Task Values
 % Number of trials
 numTrials = 8;
@@ -47,11 +51,13 @@ figure(fig_num);
 hold on;
 grid on;
 
+% plot green rectangles to represent trial periods
 for j = 1:numTrials
     rectangle('position', [trial(i,1) -8 ...
             trial(i,end)-trial(i,1) 16], 'FaceColor', [0.5 1 0.5 0.5]); % not too sure about -8 and 16
 end
 
+% plot HbO as red lines and HbR as blue lines
 plot(fnirsTimes, HbOraw, 'r');
 plot(fnirsTimes, HbRraw, 'b');
 
@@ -63,47 +69,53 @@ xlim([trial(1) trial(end)]);
 ylim([-6 6]);
 
 hold off;
-
+% AFOSR Pipeline README by Abby: "Data is displayed as changes in hemoglobin over time (hence the negative
+% and positive values)."
 
 %% Bandpass filtering
 
-% sampling rate
+% Set sampling rate to nominal rate (whatever LSL did - see xdf structs)
 fnirsSrate = str2double(fnirs_rov.info.nominal_srate);
-hbO.Fs = fnirsSrate;
-hbR.Fs = fnirsSrate;
 
+% Create struct with data, time, and sampling rate
+% data and time:
 hbO.data = double(HbOraw');
 hbR.data = double(HbRraw');
 hbO.time = fnirsTimes';
 hbR.time = fnirsTimes';
+% sampling rate:
+hbO.Fs = fnirsSrate;
+hbR.Fs = fnirsSrate;
 
-% setting up filter using nirstoolbox
+% Setting up filter using nirstoolbox
 jobs = eeg.modules.BandPassFilter();
-jobs.lowpass = 0.500;
-jobs.highpass = 0.016;
+jobs.lowpass = 0.500; % Ted Huppert recommends ~0.4-0.5 Hz
+jobs.highpass = 0.016; % ^ recommended
 
-% running the job
+% Running the job
 HbO_filtered_struct = jobs.run(hbO);
 HbR_filtered_struct = jobs.run(hbR);
 
-%% transposing the data
-HbO_filtered = HbO_filtered_struct.data';
-time_filtered = HbO_filtered_struct.time';
-HbR_filtered = HbR_filtered_struct.data';
+%% Transposing the data back to its original orientation
+HbO_filtered = HbO_filtered_struct.data'; % extracts the data field from the HbO_filtered_struct structure, & ' is the transpose operator and this transposed data is assigned to HbO_filtered variable
+time_filtered = HbO_filtered_struct.time'; % extracts time field from the HbO_filtered_struct structure, etc....
+HbR_filtered = HbR_filtered_struct.data'; % extracts data field from the HbR_filtered_struct structure, etc....
 
 %% Plotting FILTERED fNIRS data - entire session
 
-% rover:
-fig_num = fig_num+1;
+fig_num = fig_num+1; % initializes fig no. 
 figure(fig_num);
 hold on;
 grid on;
 
+% Plot green rectangles to represent trial periods
+% is "trial" a variable from another function / main script??
 for i = 1:numTrials
     rectangle('position',[trial(i,1) -8 ...
         trial(i,end)-trial(i,1) 16],'FaceColor',[0.5 1 0.5 0.5]);  % -8 and 16 again
 end
 
+% Plot transposed HbO and HbR as red lines and HbR as blue lines
 plot(time_filtered,HbO_filtered,'r');
 plot(time_filtered,HbR_filtered,'b');
 
@@ -112,46 +124,20 @@ xlabel('Time (s)');
 ylabel('Relative Concentration (mmol/L)');
 
 xlim([trial(1) trial(end)]);
-ylim([-6 6]);
-% 
+ylim([-4 4]);
+
 % if trialPlots == 1
 %     saveas(gcf,strcat(path,'Entire Session, Filtered fNIRS','.png'));
 % end
 
 hold off;
 
-% corollary:
-fig_num = fig_num+1;
-figure(fig_num);
-hold on;
-grid on;
-
-for i = 1:numTrials
-    rectangle('position',[trial(i,1) -8 ...
-        trial(i,end)-trial(i,1) 16],'FaceColor',[0.5 1 0.5 0.5]);  % -8 and 16 again
-end
-
-plot(time_filtered_cor,HbO_filtered_cor,'r');
-plot(time_filtered_cor,HbR_filtered_cor,'b');
-
-title('Entire Corollary Session: Filtered Hemoglobin Data');
-xlabel('Time (s)');
-ylabel('Relative Concentration (mmol/L)');
-
-xlim([trial(1) trial(end)]);
-ylim([-6 6]);
-
-% if trialPlots == 1
-%     saveas(gcf,strcat(path,'Entire Session, Filtered fNIRS','.png'));
-% end
-
 %% Plotting by trial
 % Find subtask time intervals
-% [nav_times, nav_dur, arm_times, arm_duration, vs_times] = SubtaskTimes(subject, cond)
+[nav_times, nav_dur, arm_times, arm_duration, vs_times] = SubtaskTimes(subject, condition);
 
 for i = 1:numTrials
-        % finding start and end time of trial in fNIRS indices - Luca wrote
-        % script in eeg_power.m
+        % finding start and end time of trial in fNIRS indices
         sidx = find(time_filtered>trial(i,1),1);
         eidx = find(time_filtered<trial(i,end),1,'last');
 
@@ -174,7 +160,7 @@ for i = 1:numTrials
     ylabel('Relative Concentration (mmol/L)');
 
     xlim([trial(i,1) trial(i,end)]);
-    ylim([-6 6]);
+    ylim([-4 4]);
     
     % % saving figure
     %   if trialPlots == 1

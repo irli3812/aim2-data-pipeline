@@ -19,27 +19,38 @@ function [nav_times, nav_dur, arm_times, arm_duration, vs_times] = SubtaskTimes(
 
 [fnirs_cor, fnirs_rov, events_cor, events_rov, ~, ~] = extract_events(subject);
 if cond == 'c'
-    cond = fnirs_cor;
+    condition = fnirs_cor;
     eventtype = events_cor;
 elseif cond == 'r'
-    cond = fnirs_rov;
+    condition = fnirs_rov;
     eventtype = events_rov;
 end
 
 % Find indices of nav, robot arm, vs task start and stop
-nav_start = find(strcmp(cond.time_series, 'Navigation Task Started') == 1);
-nav_end = find(strcmp(cond.time_series, 'Navigation Task Ended') == 1);
-arm_start = find(strcmp(cond.time_series, 'Robotic Arm Task Started') == 1);
-arm_end = find(strcmp(cond.time_series, 'Robotic Arm Task Ended') == 1);
-vs_start = find(strcmp(cond.time_series, 'Observation Task Started') == 1);
-vs_end = find(strcmp(cond.time_series, 'Observation Task Ended') == 1);
+if cond == 'r'
+    nav_start = find(strcmp(condition.time_series, 'Navigation Task Started') == 1);
+    nav_end = find(strcmp(condition.time_series, 'Navigation Task Ended') == 1);
+    arm_start = find(strcmp(condition.time_series, 'Robotic Arm Task Started') == 1);
+    arm_end = find(strcmp(condition.time_series, 'Robotic Arm Task Ended') == 1);
+    vs_start = find(strcmp(condition.time_series, 'Observation Task Started') == 1);
+    vs_end = find(strcmp(condition.time_series, 'Observation Task Ended') == 1);
+elseif cond == 'c'
+    nav_start = find(contains(condition.time_series,'Trial Started'));
+    nav_end = find(strcmp(condition.time_series,'Task 1 Ended')==1);
+    arm_start = find(strcmp(condition.time_series,'Task 1 Ended')==1);
+    arm_end = find(strcmp(condition.time_series,'Task 2 Ended')==1);
+    vs_start = find(strcmp(condition.time_series,'Task 2 Ended')==1);
+    vs_end = find(strcmp(condition.time_series,'Task 3 Ended')==1);
+end
 
 % Remove duplicates from nav_end
-for i = 2:length(nav_end)
-    if(nav_end(i) - nav_end(i-1) == 1)
-        nav_end(i-1) = [];
+idx = [];
+for i=2:length(nav_end)
+    if(nav_end(i)-nav_end(i-1)==1)
+        idx(end+1)=i-1;
     end
 end
+nav_end(idx)=[];
 
 % Initialize times arrays
 nav_times = zeros(2, length(nav_end));
@@ -69,4 +80,5 @@ arm_duration = arm_times(2,:)-arm_times(1,:)-23.0756; % 23.0756 = calculated tim
 for i=1:length(vs_end)
     vs_times(1,i) = eventtype.time_stamps(vs_start(i));
     vs_times(2,i) = eventtype.time_stamps(vs_end(i));
+end
 end
